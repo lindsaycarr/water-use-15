@@ -128,9 +128,15 @@ function updateView(newView, fireAnalytics, doTransition) {
   updateStates(activeView);
   
   // ensure we have the zoom parameters (they're in the state zoom data) and apply the zoom
-  updateStateData(newView, function() {
-    applyZoomAndStyle(newView, doTransition);
-  });
+  
+  // transition zoom if not the first load
+  if(waterUseViz.firstLoad | waterUseViz.interactionMode === 'tap') {  
+    // need to make this only apply after promise has executed for updateStates 
+    // WILL FIX IN UPCOMING COMMIT
+    applyZoomAndStyle(activeView, doTransition=false);
+  } else {
+    applyZoomAndStyle(activeView, doTransition=true);
+  }
   
   // record the change for analytics. don't need timeout for view change   
   if(fireAnalytics) {

@@ -1,15 +1,15 @@
 function updateStates(newView) {
-  updateStateData(newView, updateStateBounds);
+  updateStateData(newView);
 }
 
-function updateStateData(newView, callback) {
+function updateStateData(newView) {
   if(newView === 'USA') {
-    callback(null, 'lowres');
+    updateStateBounds('lowres');
   } else {
     if(waterUseViz.interactionMode === 'tap') {
       // don't need to load or point to highres data in mobile mode
       stateBoundsZoom = stateBoundsUSA;
-      callback(null, 'lowres');
+      updateStateBounds('lowres');
 
     } else if(map.select('#state-bounds-highres').empty()) {
       
@@ -27,19 +27,21 @@ function updateStateData(newView, callback) {
             return d.properties.STATE_ABBV+'-highres';
           })
           .attr('d', buildPath);
+          
+        console.log('statebounds detailed done');
         // do the update to highres data
-        callback(null, 'highres');
+        updateStateBounds('highres');
       });
 
     } else {
       // do the update to highres data
-      callback(null, 'highres');
+      updateStateBounds('highres');
     }
     
   }
 }
 
-function updateStateBounds(error, resolution) {
+function updateStateBounds(resolution) {
   
   map.select('#state-bounds')
     .selectAll( 'use' )

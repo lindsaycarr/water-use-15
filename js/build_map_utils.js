@@ -65,6 +65,16 @@ function drawMap(stateBoundsRaw) {
 
 function fillMap(countyCentroidData) {
   
+  // get county bounds loading first 
+  
+  if(waterUseViz.interactionMode === 'tap') {
+    // set countyBoundsUSA to something small for which !countyBoundsUSA is false so that 
+    // if and when the user zooms out from a state, updateCounties won't try to load the low-res data
+    countyBoundsUSA = true;
+  }
+  
+  loadCountyBounds(activeView);
+  
   // be ready to update the view in case someone resizes the window when zoomed in
   // d3 automatically zooms out when that happens so we need to get zoomed back in
   d3.select(window).on('resize', function(d) {
@@ -82,50 +92,38 @@ function fillMap(countyCentroidData) {
   scaleCircles = scaleCircles
   .domain(waterUseViz.nationalRange);
   
-  if(activeView !== "USA") {
-    loadInitialCounties();
-  }
-  
   // add the circles
   // CIRCLES-AS-CIRCLES
   /*addCircles(countyCentroids);*/
-    // CIRCLES-AS-PATHS
+  // CIRCLES-AS-PATHS
   var circlesPaths = prepareCirclePaths(categories, countyCentroids);
   addCircles(circlesPaths);
   updateCircleCategory(activeCategory);
   
   // update the legend values and text
   updateLegendTextToView();
+
+  // once the main map has been filled, any other click is no longer the firstLoad
+  waterUseViz.firstLoad = false;
+
+  // format data for rankEm
+  var  barData = [];
+  waterUseViz.stateData.forEach(function(d) {
+    var x = {
+      'abrv': d.abrv,
+      'STATE_NAME': d.STATE_NAME,
+      'open': d.open,
+      'wu': d.use.filter(function(e) {return e.category === 'total';})[0].wateruse,
+      'fancynums': d.use.filter(function(e) {return e.category === 'total';})[0].fancynums
+    };
+    barData.push(x);
+  });
   
-  // load county data, add and update county polygons.
-  // it's OK if it's not done right away; it should be loaded by the time anyone tries to hover!
-    // and it doesn't need to be done at all for mobile
-  if(waterUseViz.interactionMode !== 'tap') {
-  updateCounties('USA');
-  } else {
-  // set countyBoundsUSA to something small for which !countyBoundsUSA is false so that 
-  // if and when the user zooms out from a state, updateCounties won't try to load the low-res data
-  countyBoundsUSA = true;
-  }
-
-// format data for rankEm
-var  barData = [];
-waterUseViz.stateData.forEach(function(d) {
-  var x = {
-    'abrv': d.abrv,
-    'STATE_NAME': d.STATE_NAME,
-    'open': d.open,
-    'wu': d.use.filter(function(e) {return e.category === 'total';})[0].wateruse,
-    'fancynums': d.use.filter(function(e) {return e.category === 'total';})[0].fancynums
-  };
-  barData.push(x);
-});
-
-// create big pie figure (uses waterUseViz.nationalData)
-if(!waterUseViz.isEmbed) loadPie();
-
-// create rankEm figure  
-if(!waterUseViz.isEmbed) rankEm(barData);
+  // create big pie figure (uses waterUseViz.nationalData)
+  if(!waterUseViz.isEmbed) loadPie();
+  
+  // create rankEm figure  
+  if(!waterUseViz.isEmbed) rankEm(barData);
 
 }
 

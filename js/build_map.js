@@ -30,7 +30,8 @@ var waterUseViz = {
   stateAbrvs: [], // created in extractNames()
   nationalData: {},
   stateData: {},
-  isEmbed: RegExp("embed-water-use-15").test(window.location.pathname)
+  isEmbed: RegExp("embed-water-use-15").test(window.location.pathname),
+  firstLoad: true
 };
 
 // Globals not yet in waterUseViz
