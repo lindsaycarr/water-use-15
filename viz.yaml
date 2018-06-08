@@ -272,7 +272,7 @@ publish:
   -
     id: topojson
     location: "js/topojson.v1.min.js"
-    mimetype: application/javascript
+    mimetype: application/javascript  
   -
     id: d3-v5-js
     location: "js/d3.v5.min.js"
@@ -283,6 +283,7 @@ publish:
     mimetype: application/javascript
     publish_args:
       js_files: [
+        "js/es6-promise.auto.min.js", "js/fetch.js", # these two needed for promises in IE11
         "js/url_hashes.js", "js/custom_projection.js", "js/styles.js", "js/buttons.js",
         "js/resize.js", "js/map_utils.js", "js/states.js", "js/counties.js", "js/watermark.js", 
         "js/circles.js", "js/mobile_ui.js", "js/modernizr_custom.js", "js/lazy_loading.js", 
