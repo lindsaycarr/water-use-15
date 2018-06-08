@@ -53,17 +53,17 @@ function customizeCaption() {
 function drawMap(stateBoundsRaw) {
   
   // Immediately convert to geojson so we have that converted data available globally.
-  stateBoundsUSA = topojson.feature(stateBoundsRaw, stateBoundsRaw.objects.states);
+  waterUseViz.stateBoundsUSA = topojson.feature(stateBoundsRaw, stateBoundsRaw.objects.states);
   
   // get state abreviations into waterUseViz.stateAbrvs for later use
-  extractNames(stateBoundsUSA);  
+  extractNames(waterUseViz.stateBoundsUSA);  
   
   // add the main, active map features
-  addStates(map, stateBoundsUSA);
+  addStates(map, waterUseViz.stateBoundsUSA);
   
 }
 
-function fillMap(countyCentroidData) {
+function fillMap() {
   
   // be ready to update the view in case someone resizes the window when zoomed in
   // d3 automatically zooms out when that happens so we need to get zoomed back in
@@ -72,71 +72,53 @@ function fillMap(countyCentroidData) {
     updateView(activeView, fireAnalytics = false, doTransition = false);
   }); 
   
-  countyCentroids = countyCentroidData; // had to name arg differently, otherwise error loading boundary data...
-  
   // manipulate dropdowns - selector options require countyCentroids if starting zoomed in
-  updateViewSelectorOptions(activeView, stateBoundsUSA);
+  updateViewSelectorOptions(activeView, waterUseViz.stateBoundsUSA);
   addZoomOutButton(activeView);
   
   // update circle scale with data
   scaleCircles = scaleCircles
   .domain(waterUseViz.nationalRange);
   
-  if(activeView !== "USA") {
-    loadInitialCounties();
-  }
-  
   // add the circles
   // CIRCLES-AS-CIRCLES
   /*addCircles(countyCentroids);*/
-    // CIRCLES-AS-PATHS
-  var circlesPaths = prepareCirclePaths(categories, countyCentroids);
+  // CIRCLES-AS-PATHS
+  var circlesPaths = prepareCirclePaths(categories, waterUseViz.countyCentroids);
   addCircles(circlesPaths);
   updateCircleCategory(activeCategory);
   
   // update the legend values and text
   updateLegendTextToView();
-  
-  // load county data, add and update county polygons.
-  // it's OK if it's not done right away; it should be loaded by the time anyone tries to hover!
-    // and it doesn't need to be done at all for mobile
-  if(waterUseViz.interactionMode !== 'tap') {
-  updateCounties('USA');
-  } else {
-  // set countyBoundsUSA to something small for which !countyBoundsUSA is false so that 
-  // if and when the user zooms out from a state, updateCounties won't try to load the low-res data
-  countyBoundsUSA = true;
+
+  // get county bounds displayed after circles 
+  if(waterUseViz.interactionMode === 'tap') {
+    // set countyBoundsUSA to something small for which !countyBoundsUSA is false so that 
+    // if and when the user zooms out from a state, updateCounties won't try to load the low-res data
+    countyBoundsUSA = true;
   }
+  loadCountyBounds(activeView);
 
-// format data for rankEm
-var  barData = [];
-waterUseViz.stateData.forEach(function(d) {
-  var x = {
-    'abrv': d.abrv,
-    'STATE_NAME': d.STATE_NAME,
-    'open': d.open,
-    'wu': d.use.filter(function(e) {return e.category === 'total';})[0].wateruse,
-    'fancynums': d.use.filter(function(e) {return e.category === 'total';})[0].fancynums
-  };
-  barData.push(x);
-});
+  // once the main map has been filled, any other click is no longer the firstLoad
+  waterUseViz.firstLoad = false;
 
-// create big pie figure (uses waterUseViz.nationalData)
-if(!waterUseViz.isEmbed) loadPie();
-
-// create rankEm figure  
-if(!waterUseViz.isEmbed) rankEm(barData);
-
-}
-
-function loadInitialCounties() {
-  // update the view once the county data is loaded
+  // format data for rankEm
+  var  barData = [];
+  waterUseViz.stateData.forEach(function(d) {
+    var x = {
+      'abrv': d.abrv,
+      'STATE_NAME': d.STATE_NAME,
+      'open': d.open,
+      'wu': d.use.filter(function(e) {return e.category === 'total';})[0].wateruse,
+      'fancynums': d.use.filter(function(e) {return e.category === 'total';})[0].fancynums
+    };
+    barData.push(x);
+  });
   
-  function waitForCounties(error, results){
-    updateView(activeView);
-  }
+  // create big pie figure (uses waterUseViz.nationalData)
+  if(!waterUseViz.isEmbed) loadPie();
   
-  d3.queue()
-  .defer(loadCountyBounds, activeView)
-  .await(waitForCounties);
+  // create rankEm figure  
+  if(!waterUseViz.isEmbed) rankEm(barData);
+
 }
