@@ -100,7 +100,7 @@ function addCountyOptions(selectedView) {
   //uses global variable, `countyCentroids`
   
   // filter to correct county data then update dropdowns
-  var stateCountyData = countyCentroids
+  var stateCountyData = waterUseViz.countyCentroids
     .filter(function(d) { return d.STATE_ABBV === selectedView; });
   updateCountySelectorOptions(stateCountyData);
 }

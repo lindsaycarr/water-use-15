@@ -28,6 +28,8 @@ var waterUseViz = {
     buttonBox: null
   },
   stateAbrvs: [], // created in extractNames()
+  stateBoundsUSA: {},
+  countyCentroids: {},
   nationalData: {},
   stateData: {},
   isEmbed: RegExp("embed-water-use-15").test(window.location.pathname),
@@ -36,7 +38,7 @@ var waterUseViz = {
 
 // Globals not yet in waterUseViz
 var activeView, activeCategory, prevCategory;
-var stateBoundsUSA, stateBoundsZoom, countyBoundsUSA, countyCentroids;
+var stateBoundsZoom, countyBoundsUSA;
 var countyBoundsZoom = new Map();
 var categories = ["total", "thermoelectric", "irrigation","publicsupply", "industrial"];
 
@@ -100,36 +102,38 @@ if(waterUseViz.interactionMode === 'tap') {
   stateDataFile = "data/state_boundaries_USA.json";
 }
 
-d3.json(stateDataFile, function(error, stateBoundsRaw) {
-  if (error) throw error;
-  drawMap(stateBoundsRaw);
-});
+d3.json(stateDataFile)
+  .then(function(stateBoundsRaw) {
+    drawMap(stateBoundsRaw);
+  });
 
-d3.tsv("data/county_centroids_wu.tsv", function(error, countyCentroids) {
+var county_data_promise = d3.tsv("data/county_centroids_wu.tsv")
+  .then(function(countyCentroids) {
+    waterUseViz.countyCentroids = countyCentroids;
+  });
   
-  if (error) throw error;
-
-  d3.json("data/wu_data_15_range.json", function(error, waterUseRange) {
-
-    if (error) throw error;
+var range_data_promise = d3.json("data/wu_data_15_range.json")
+  .then(function(waterUseRange) {
     // nationalRange gets used in drawMap->addStates->applyZoomAndStyle and
     // fillMap->scaleCircles-update
     waterUseViz.nationalRange = waterUseRange;
-
-    d3.json("data/wu_data_15_sum.json", function(error, waterUseNational) {
-      
-      if (error) throw error;
-      // cache data for dotmap and update legend if we're in national view
-      waterUseViz.nationalData = waterUseNational;
-      
-      d3.json("data/wu_state_data.json", function(error, waterUseState) {
-        
-        if (error) throw error;
-        // cache data for dotmap
-        waterUseViz.stateData = waterUseState;
-        fillMap(countyCentroids);
-        
-      });
-    });
   });
-});
+  
+var sum_data_promise = d3.json("data/wu_data_15_sum.json")
+  .then(function(waterUseNational) {
+    // cache data for dotmap and update legend if we're in national view
+    waterUseViz.nationalData = waterUseNational;
+  });
+      
+var state_data_promise = d3.json("data/wu_state_data.json")
+  .then(function(waterUseState) {
+    // cache data for dotmap
+    waterUseViz.stateData = waterUseState;
+  });     
+
+Promise.all([county_data_promise, range_data_promise, sum_data_promise, state_data_promise])
+  .then(function() {
+    waterUseViz.course_county_bounds_promise = d3.json('data/county_boundaries_USA.json');
+    
+    fillMap();
+  });

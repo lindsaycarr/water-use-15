@@ -53,27 +53,17 @@ function customizeCaption() {
 function drawMap(stateBoundsRaw) {
   
   // Immediately convert to geojson so we have that converted data available globally.
-  stateBoundsUSA = topojson.feature(stateBoundsRaw, stateBoundsRaw.objects.states);
+  waterUseViz.stateBoundsUSA = topojson.feature(stateBoundsRaw, stateBoundsRaw.objects.states);
   
   // get state abreviations into waterUseViz.stateAbrvs for later use
-  extractNames(stateBoundsUSA);  
+  extractNames(waterUseViz.stateBoundsUSA);  
   
   // add the main, active map features
-  addStates(map, stateBoundsUSA);
+  addStates(map, waterUseViz.stateBoundsUSA);
   
 }
 
-function fillMap(countyCentroidData) {
-  
-  // get county bounds loading first 
-  
-  if(waterUseViz.interactionMode === 'tap') {
-    // set countyBoundsUSA to something small for which !countyBoundsUSA is false so that 
-    // if and when the user zooms out from a state, updateCounties won't try to load the low-res data
-    countyBoundsUSA = true;
-  }
-  
-  loadCountyBounds(activeView);
+function fillMap() {
   
   // be ready to update the view in case someone resizes the window when zoomed in
   // d3 automatically zooms out when that happens so we need to get zoomed back in
@@ -82,10 +72,8 @@ function fillMap(countyCentroidData) {
     updateView(activeView, fireAnalytics = false, doTransition = false);
   }); 
   
-  countyCentroids = countyCentroidData; // had to name arg differently, otherwise error loading boundary data...
-  
   // manipulate dropdowns - selector options require countyCentroids if starting zoomed in
-  updateViewSelectorOptions(activeView, stateBoundsUSA);
+  updateViewSelectorOptions(activeView, waterUseViz.stateBoundsUSA);
   addZoomOutButton(activeView);
   
   // update circle scale with data
@@ -96,12 +84,20 @@ function fillMap(countyCentroidData) {
   // CIRCLES-AS-CIRCLES
   /*addCircles(countyCentroids);*/
   // CIRCLES-AS-PATHS
-  var circlesPaths = prepareCirclePaths(categories, countyCentroids);
+  var circlesPaths = prepareCirclePaths(categories, waterUseViz.countyCentroids);
   addCircles(circlesPaths);
   updateCircleCategory(activeCategory);
   
   // update the legend values and text
   updateLegendTextToView();
+
+  // get county bounds displayed after circles 
+  if(waterUseViz.interactionMode === 'tap') {
+    // set countyBoundsUSA to something small for which !countyBoundsUSA is false so that 
+    // if and when the user zooms out from a state, updateCounties won't try to load the low-res data
+    countyBoundsUSA = true;
+  }
+  loadCountyBounds(activeView);
 
   // once the main map has been filled, any other click is no longer the firstLoad
   waterUseViz.firstLoad = false;
@@ -125,16 +121,4 @@ function fillMap(countyCentroidData) {
   // create rankEm figure  
   if(!waterUseViz.isEmbed) rankEm(barData);
 
-}
-
-function loadInitialCounties() {
-  // update the view once the county data is loaded
-  
-  function waitForCounties(error, results){
-    updateView(activeView);
-  }
-  
-  d3.queue()
-  .defer(loadCountyBounds, activeView)
-  .await(waitForCounties);
 }

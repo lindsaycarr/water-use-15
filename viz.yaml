@@ -238,7 +238,7 @@ publish:
     template: fullpage
     publisher: page
     depends:
-      lib_d3_js: "lib-d3-js"
+      d3_v5_js: "d3-v5-js"
       topojson: "topojson"
       vizlab-favicon: "lib-vizlab-favicon"
       all_css: "all_css"
@@ -263,7 +263,7 @@ publish:
       thumb_landing: thumb_landing
       wu_state_data_json: wu_state_data_json
     context:
-      resources: ["lib_d3_js", "topojson", "vizlab-favicon", "all_css", "all_js_minified"]
+      resources: ["d3_v5_js", "topojson", "vizlab-favicon", "all_css", "all_js_minified"]
       sections: ["social", "mobile_map_ui", "map_section", "wu_story"] # adding header and footer here, doubled each on the page
       thumbnails: 
         twitter: thumb_twitter
@@ -272,6 +272,10 @@ publish:
   -
     id: topojson
     location: "js/topojson.v1.min.js"
+    mimetype: application/javascript
+  -
+    id: d3-v5-js
+    location: "js/d3.v5.min.js"
     mimetype: application/javascript
   -
     id: all_js_minified
@@ -425,7 +429,7 @@ publish:
     template: embed
     mimetype: text/html
     depends:
-      lib_d3_js: lib-d3-js
+      d3_v5_js: d3-v5-js
       topojson: topojson
       all_css: all_css
       all_js_minified: all_js_minified
@@ -441,7 +445,7 @@ publish:
       wu_data_15_sum_json: wu_data_15_sum_json
       wu_state_data_json: wu_state_data_json
     context:
-      resources: ["lib_d3_js", "topojson", "all_css", "all_js_minified"]
+      resources: ["d3_v5_js", "topojson", "all_css", "all_js_minified"]
       embed: ["embed_map"]
   -
     id: thumb_facebook
