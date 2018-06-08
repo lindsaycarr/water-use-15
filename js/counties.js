@@ -23,7 +23,7 @@ function loadCountyBounds(state) {
           // extract the topojson to geojson and add data. cache the data to a global variable, countyBoundsUSA
           allCountiesGeo = topojson.feature(allCountiesTopo, allCountiesTopo.objects.counties).features;
           countyBoundsUSA = addDataToCounties(allCountiesGeo);
-          console.log(countyBoundsUSA);
+          
           // do the update
           displayCountyBounds(countyBoundsUSA);
         });

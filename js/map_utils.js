@@ -128,7 +128,7 @@ function updateView(newView, fireAnalytics, doTransition) {
   
   // ensure we have the zoom parameters (they're in the state zoom data) and apply the zoom
   var state_data_promise = updateStates(activeView);
-  console.log(state_data_promise);
+  
   Promise.all([state_data_promise])
     .then(function() {
       // zoom and apply style
@@ -158,7 +158,7 @@ function applyZoomAndStyle(newView, doTransition) {
   if(doTransition === undefined) {
     doTransition = true;
   }
-  console.log('styling!');
+  
   // determine the center point and scaling for the new view
   var zoom;
   if(activeView === 'USA') {
