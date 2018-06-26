@@ -27,6 +27,10 @@ function detectDevice() {
   }else{
    waterUseViz.interactionMode = 'hover';
   }
+  
+  // none of that matters for this example. Just assume mobile so we can get the state click.
+  waterUseViz.interactionMode = 'tap';
+  
 }
 
 function resize() {

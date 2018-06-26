@@ -21,8 +21,8 @@ function loadCountyBounds(state, callback) {
       
         // extract the topojson to geojson and add data. cache the data to a global variable, countyBoundsUSA
         allCountiesGeo = topojson.feature(allCountiesTopo, allCountiesTopo.objects.counties).features;
-        countyBoundsUSA = addDataToCounties(allCountiesGeo);
-        
+        //countyBoundsUSA = addDataToCounties(allCountiesGeo);
+        countyBoundsUSA = allCountiesGeo;
         // do the update
         callback(null, countyBoundsUSA);
         
@@ -42,12 +42,12 @@ function loadCountyBounds(state, callback) {
       
       // extract the topojson to geojson and add data
       allCountiesGeo = topojson.feature(allCountiesTopo, allCountiesTopo.objects.counties).features;
-      allCountiesGeoData = addDataToCounties(allCountiesGeo);
-      
+      //allCountiesGeoData = addDataToCounties(allCountiesGeo);
+      allCountiesGeoData = allCountiesGeo;
       // cache in countyBoundsZoom
       countyBoundsZoom.set('USA', allCountiesGeo);
       
-      cacheCountyBounds(state, callback);
+      //cacheCountyBounds(state, callback);
       
       // make sure the styles are right. this is only important for mobile when loading
       // into USA view such that the first call to updateCounties happens when zooming in;
@@ -58,7 +58,7 @@ function loadCountyBounds(state, callback) {
 
     });
   } else {
-    cacheCountyBounds(state, callback);
+    //cacheCountyBounds(state, callback);
   }
 }
 
@@ -136,25 +136,25 @@ function displayCountyBounds(error, activeCountyData) {
       countyMouser.on('click', function(d,i,j) {
         // hide on any tap because either we'll zoom out or we'll switch
         // to highlighting a different county
-        unhighlightCounty();
-        unhighlightCircle();
+        //unhighlightCounty();
+        //unhighlightCircle();
 
         // highlight the clicked county if it's a new county, or zoom out
         // if it's the same county as before
-        var prevCounty = waterUseViz.prevClickCounty;
-        var thisCountyID = d3.select(this).attr("id");
-        if(prevCounty === thisCountyID) {
-          updateLegendTextToView(); 
+        //var prevCounty = waterUseViz.prevClickCounty;
+        //var thisCountyID = d3.select(this).attr("id");
+        //if(prevCounty === thisCountyID) {
+          //updateLegendTextToView(); 
           zoomToFromState(d,i,j, d3.select(this));
-        } else {
-          updateLegendText(d.properties, activeCategory);
-          highlightCounty(d3.select(this)); 
-          highlightCircle(d.properties, activeCategory);
-          updateCountySelector(thisCountyID);
-        }
+        //} else {
+          //updateLegendText(d.properties, activeCategory);
+          //highlightCounty(d3.select(this)); 
+          //highlightCircle(d.properties, activeCategory);
+          //updateCountySelector(thisCountyID);
+        //}
 
         // set prevClickCounty as global var for next click
-        waterUseViz.prevClickCounty = thisCountyID;
+        //waterUseViz.prevClickCounty = thisCountyID;
       });
       
     // desktop mouse events - click to zoom, hover to highlight

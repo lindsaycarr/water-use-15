@@ -171,6 +171,11 @@ h3{
   fill: #393939;
 }
 
+/* turn off category buttons */
+#button-container {
+  display: none;
+}
+
 #button-background{
   fill:white;
   opacity:0.7;

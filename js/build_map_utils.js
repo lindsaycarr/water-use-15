@@ -80,16 +80,12 @@ function fillMap(countyCentroidData) {
   
   // update circle scale with data
   scaleCircles = scaleCircles
-  .domain(waterUseViz.nationalRange);
+  .domain([0,20]);
   
-  if(activeView !== "USA") {
+  //if(activeView !== "USA") {
     loadInitialCounties();
-  }
+  //}
   
-  // add the circles
-  // CIRCLES-AS-CIRCLES
-  /*addCircles(countyCentroids);*/
-    // CIRCLES-AS-PATHS
   var circlesPaths = prepareCirclePaths(categories, countyCentroids);
   addCircles(circlesPaths);
   updateCircleCategory(activeCategory);

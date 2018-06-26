@@ -173,8 +173,8 @@ function applyZoomAndStyle(newView, doTransition) {
   // know the nationalRange, which is not the case when we first add states
   if(typeof waterUseViz.nationalRange !== 'undefined') {
     var stateZoomRatio = 0.4;
-    var newScaling = [waterUseViz.nationalRange[0]*zoom.s,
-                      waterUseViz.nationalRange[1]*zoom.s*stateZoomRatio];
+    var newScaling = [0*zoom.s,
+                      20*zoom.s*stateZoomRatio];
     if(scaleCircles.domain() !== newScaling) {
       // only change circle scale if it's different
       scaleCircles.domain(newScaling);
@@ -188,8 +188,8 @@ function applyZoomAndStyle(newView, doTransition) {
   deemphasizeCounty();
   resetState();
   unhighlightCounty();
-  unhighlightCircle();
-  updateLegendTextToView();
+  //unhighlightCircle();
+  //updateLegendTextToView();
 
   // change the zoom button or county dropdown based on view
   updateZoomOutButton(activeView);
@@ -225,7 +225,7 @@ function applyZoomAndStyle(newView, doTransition) {
   // apply the transform (i.e., actually zoom in or out)
   var zoomTime;
   if(waterUseViz.interactionMode !== 'hover' || !doTransition){
-    zoomTime = 0;
+    zoomTime = 750;
   } else {
     zoomTime = 750;
   }

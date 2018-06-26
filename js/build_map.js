@@ -50,7 +50,7 @@ var buildPath = d3.geoPath()
 
 // circle scale
 var scaleCircles = d3.scaleSqrt()
-  .range([0, 10]);
+  .range([0, 2]);
   
 /** Get user view preferences **/
 
@@ -104,7 +104,7 @@ d3.json(stateDataFile, function(error, stateBoundsRaw) {
   drawMap(stateBoundsRaw);
 });
 
-d3.tsv("data/county_centroids_wu.tsv", function(error, countyCentroids) {
+d3.tsv("data/site_locations_formatted.tsv", function(error, countyCentroids) {
   
   if (error) throw error;
 
