@@ -17,7 +17,8 @@ process.format_site_locations <- function(viz) {
            other = 20,
            lat = dec_lat_va,
            lon = dec_long_va) %>% 
-    select(-c(site_no, station_nm, dec_lat_va, dec_long_va, state_cd, county_cd, state_abbv))
+    select(-c(site_no, station_nm, dec_lat_va, dec_long_va, state_cd, county_cd, state_abbv)) %>% 
+    sample_n(nrow(data))
   
   readr::write_tsv(data_formatted, path=viz[['location']])
 }
