@@ -91,6 +91,14 @@ svg {
   stroke-width: 2;
 }
 
+#wu-path-0 {
+  fill: rgba(225, 87, 89, 0.8);
+}
+
+#wu-path-1 {
+  fill: rgba(38, 140, 178, 0.8);
+}
+
 #wu-highlight {
   opacity: 1;
 }

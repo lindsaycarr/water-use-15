@@ -77,8 +77,8 @@ function addCircles(circlesPaths) {
     .attr('id', function(d,i) {
       return 'wu-path-'+i;
     })
-    .style('stroke','none')
-    .style('fill', 'none'); // start transparent & updateCircleColor will transition to color
+    .style('stroke','none');
+    //.style('fill', 'none'); // start transparent & updateCircleColor will transition to color
   
 
   map.selectAll('g#wu-circles')
@@ -122,9 +122,9 @@ function updateCircleCategory(category) {
         // use i to be first or second chunk
         return createCirclePath(category, countyCentroids, i);
       } 
-    })
+    });
     //.style("stroke", categoryToColor(category, 0.8))
-    .style("fill", categoryToColor(category, 0.8));
+    //.style("fill", categoryToColor(category, 0.8));
   
 
 }
