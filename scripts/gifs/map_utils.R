@@ -53,16 +53,19 @@ get_moves <- function(){
 
 shifted_topojson <- function(filename, proj.string = "+proj=laea +lat_0=45 +lon_0=-100 +x_0=0 +y_0=0 +a=6370997 +b=6370997 +units=m +no_defs"){
   states <- topojson_read(filename)
-  proj4string(states) <- CRS("+proj=longlat +datum=WGS84")
-  states_proj <- spTransform(states, CRS(proj.string))
+  st_crs(states) <- CRS("+proj=longlat +datum=WGS84")
+  states_proj <- st_transform(states, CRS(proj.string))
   shifts <- get_shifts()
   moves <- get_moves()
   code.map <- list(AK = "AK", HI = "HI", PR = c("PR","VI"))
   shift_abbr <- code.map %>% unlist %>% unname
-  states_out <- subset(states_proj, !STATE_ABBV %in% shift_abbr)
+  
+  states_proj_sp <- as(states_proj, "Spatial")
+  states_out <- subset(states_proj_sp, !STATE_ABBV %in% shift_abbr)
   
   for(region in names(code.map)){
-    to_shift <- subset(states_proj, STATE_ABBV %in% code.map[[region]])
+    
+    to_shift <- subset(states_proj_sp, STATE_ABBV %in% code.map[[region]])
     shifted <- do.call(shift_sp, append(list(sp = to_shift, 
                                              ref = moves[[region]],
                                              proj.string = proj4string(states_out),
@@ -94,17 +97,17 @@ state_sp <- function(){
 }
 
 shift_centroids <- function(centroids, proj.string = "+proj=laea +lat_0=45 +lon_0=-100 +x_0=0 +y_0=0 +a=6370997 +b=6370997 +units=m +no_defs"){
-    
+  
   shifts <- get_shifts()
   
   centroids <-  sp::spTransform(centroids, CRS(proj.string))
   stuff_to_move <- get_moves()
   
-  sites.out <- subset(centroids, !state %in% c(names(shifts), 'VI'))
+  sites.out <- subset(centroids, !STATE_ABBV %in% c(names(shifts), 'VI'))
   
   for (region in names(shifts)){
-    sites.tmp <- subset(centroids, state %in% region)
-    
+    sites.tmp <- subset(centroids, STATE_ABBV %in% region)
+    if(length(sites.tmp) == 0) next
     sites.tmp <- do.call(shift_sp, c(sp = sites.tmp, ref = stuff_to_move[[region]], 
                                      shifts[[region]]))
     sites.out <- rbind(sites.out, sites.tmp)
@@ -137,4 +140,8 @@ shift_sp <- function(sp, scale = NULL, shift = NULL, rotate = 0, ref=sp, proj.st
     row.names(obj) <- row.names
   }
   return(obj)
+}
+
+subset_sp <- function(state_sp, state_abbreviations) {
+  subset(state_sp, STATE_ABBV %in% state_abbreviations)
 }

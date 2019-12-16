@@ -24,14 +24,21 @@ get_national_layout <- function(sp, plot_metadata){
 }
 
 
-get_state_layout <- function(sp, plot_metadata){
-  
+get_state_layout <- function(sp, plot_metadata, legend_title = NULL){
+
+  # Add custom legend title
+  if(is.null(legend_title)) {
+    legend_title <- names(sp)
+  } else {
+    legend_title <- legend_title
+  }
+    
   state_bb <- bbox(sp)
 
   layout_out <- list(figure = list(width = plot_metadata[1], height = plot_metadata[2], res = plot_metadata[3]),
                      map = list(xlim = c(NA_integer_, NA_integer_), ylim = c(NA_integer_, NA_integer_)),
                      legend = list(xpct = NA_integer_, ypct = NA_integer_, box_h = 0.055, y_bump = 0.015, box_w = 0.32,
-                                   title_pos = 'top', title = names(sp)))
+                                   title_pos = 'top', title = legend_title))
   aspect_map <- diff(state_bb[c(1,3)])/diff(state_bb[c(2,4)])
   if (aspect_map < 1.2){
     plot_metadata[1] <- plot_metadata[1] * 0.75
@@ -147,7 +154,6 @@ build_wu_gif <- function(state_sp, county_sp, dots_sp, state_totals, state_layou
   
   frame_filenames <- calc_frame_filenames(frames, ...)
   
-  
   gifsicle_out <- c('')
   temp_dir <- tempdir()
   message(temp_dir)
@@ -199,12 +205,12 @@ build_wu_gif <- function(state_sp, county_sp, dots_sp, state_totals, state_layou
     
   }
   
-  gif_filename <- as_data_file(ind_file)
+  gif_filename <- ind_file #as_data_file(ind_file)
   
-  system(paste0("convert -loop 0 -delay 15 ", paste(file.path(temp_dir, frame_filenames), collapse = " "), " ", gif_filename))
+  system(paste0("magick -loop 0 -delay 15 ", paste(file.path(temp_dir, frame_filenames), collapse = " "), " ", gif_filename))
   
   system(sprintf('gifsicle -b %s %s --colors 256', gif_filename, gifsicle_out))
-  gd_put(remote_ind = ind_file, local_source = gif_filename, config_file = 'gifs/gd_config.yml')
+  #gd_put(remote_ind = ind_file, local_source = gif_filename, config_file = 'gifs/gd_config.yml')
 }
 
 categories <- function(){
